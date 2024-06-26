@@ -1,20 +1,33 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import * as React from 'react';
+import Dashboard from './src/modules/dashboard';
+import AddEditTask from './src/modules/AddEditTask';
 
-export default function App() {
+const Stack = createNativeStackNavigator();
+
+const AuthContext = React.createContext({
+  fixtureMode: false,
+});
+
+function App() {
+  const navigationRef = React.useRef();
+  const fixtureMode = false;
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <AuthContext.Provider value={{ fixtureMode }}>
+      <NavigationContainer ref={navigationRef}>
+        <Stack.Navigator initialRouteName="Dashboard">
+          <Stack.Screen name="Dashboard" component={Dashboard} options={{ headerShown: false }} />
+          <Stack.Screen
+            name="AddEditTask"
+            component={AddEditTask}
+            options={{ headerShown: true, title: 'Create New Task' }}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </AuthContext.Provider>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default App;
