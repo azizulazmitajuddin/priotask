@@ -20,12 +20,8 @@ npm i -g yarn
 Clone the repo. Then run below to get started.
 
 ```
-// install local dependencies first,
-// you don't need this all time, usually when first time running
-// or when you clear off the node_modules for packages or apps
-yarn workspaces focus
 
-// install all of other deps
+// install all of depedencies
 yarn install
 ```
 
