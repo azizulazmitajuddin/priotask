@@ -11,7 +11,7 @@ import {
   Platform,
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { DecryptedData, EncryptedData } from '../utils.js';
+import { DecryptedData, EncryptedData } from '../utils.js/index.js';
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as LocalAuthentication from 'expo-local-authentication';
@@ -29,20 +29,8 @@ export default function AddEditTask({ route }) {
   const [inputTaskName, setInputTaskName] = useState('');
   const [inputDescription, setInputDescription] = useState('');
   const [isEnabled, setIsEnabled] = useState(false);
-  const [dateTask, setDate] = useState(new Date());
-  const [openCalendar, setOpenCalendar] = useState(false);
 
   const [listTask, setListTask] = useState([]);
-
-  // function for date calendar
-  const handleOpenCalendar = () => {
-    setOpenCalendar(!openCalendar);
-  };
-  const onChange = (event, selectedDate) => {
-    const currentDate = selectedDate;
-    setOpenCalendar(!openCalendar);
-    setDate(currentDate);
-  };
 
   // function for switch encryption
   const toggleSwitch = () => setIsEnabled((previousState) => !previousState);
@@ -69,9 +57,7 @@ export default function AddEditTask({ route }) {
 
   // handle delete task
   const handleDeleteTask = useCallback(async () => {
-    const final = listTask.filter(
-      (a) => a.taskName !== routeData.taskName && a.dateTask !== routeData.dateTask
-    );
+    const final = listTask.filter((a) => a.taskName !== routeData.taskName);
     await AsyncStorage.setItem('@list_task', JSON.stringify(final));
     navigation.navigate('Dashboard');
   }, [routeData, listTask]);
@@ -83,17 +69,16 @@ export default function AddEditTask({ route }) {
         taskName: isEnabled ? EncryptedData(inputTaskName) : inputTaskName,
         description: isEnabled ? EncryptedData(inputDescription) : inputDescription,
         dateCreated: moment().unix(),
-        dateTask: moment(dateTask).unix(),
         isEncrypted: routeData?.isEncrypted ? !Boolean(isEnabled) : Boolean(isEnabled),
         isDone: routeData?.screenId === 1,
       };
 
       if (routeData?.screenId === 1) {
         const temp = listTask?.map((a) => {
-          if (a.dateTask === routeData.dateTask && a.taskName === routeData.taskName) {
+          if (a.taskName === routeData.taskName) {
             return {
               ...a,
-              isDone: a.dateTask === routeData.dateTask && a.taskName === routeData.taskName,
+              isDone: a.taskName === routeData.taskName,
             };
           } else {
             return a;
@@ -133,7 +118,6 @@ export default function AddEditTask({ route }) {
   useEffect(() => {
     setInputTaskName(routeData?.taskName);
     setInputDescription(routeData?.description);
-    routeData?.dateTask && setDate(new Date(moment.unix(routeData?.dateTask)));
     setIsEnabled(routeData?.isEncrypted);
   }, [routeData]);
 
@@ -178,44 +162,6 @@ export default function AddEditTask({ route }) {
               />
             </View>
 
-            <Text style={{ fontSize: 15, fontWeight: '600', paddingTop: 30 }}>Date</Text>
-            {Platform.OS === 'ios' ? (
-              <DateTimePicker
-                disabled={routeData?.screenId === 1}
-                testID="dateTimePicker"
-                value={dateTask}
-                mode="date"
-                is24Hour={true}
-                onChange={onChange}
-                display="spinner"
-              />
-            ) : (
-              <TouchableOpacity onPress={handleOpenCalendar}>
-                <View
-                  style={{
-                    padding: 15,
-                    marginVertical: 10,
-                    borderWidth: 1,
-                    borderColor: 'lightgrey',
-                    borderRadius: 10,
-                  }}
-                >
-                  <Text>{moment(dateTask).format('DD MMM YYYY')}</Text>
-                </View>
-                {openCalendar && (
-                  <DateTimePicker
-                    disabled={routeData?.screenId === 1}
-                    testID="dateTimePicker"
-                    value={dateTask}
-                    mode="date"
-                    is24Hour={true}
-                    onChange={onChange}
-                    display="default"
-                  />
-                )}
-              </TouchableOpacity>
-            )}
-
             <Text style={{ fontSize: 15, fontWeight: '600', paddingTop: 30 }}>Description</Text>
             <View style={{ paddingVertical: 10, flexDirection: 'row' }}>
               <TextInput
@@ -253,58 +199,6 @@ export default function AddEditTask({ route }) {
                 disabled={routeData?.screenId === 1}
               />
             </View>
-
-            {isEnabled && (
-              <LinearGradient
-                colors={['#fff', '#efefef', '#fff']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={{
-                  flex: 1,
-                  gap: 5,
-                  borderRadius: 10,
-                  paddingHorizontal: 20,
-                  paddingVertical: 15,
-                  marginTop: 15,
-                  borderWidth: 1,
-                  borderColor: '#efefef',
-                }}
-              >
-                <View>
-                  <Text style={{ fontSize: 15, fontWeight: '600' }}>Task Name</Text>
-                  <View style={{ paddingTop: 5 }}>
-                    <Text
-                      numberOfLines={2}
-                      style={{
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                      }}
-                    >
-                      {EncryptedData(inputTaskName)}
-                    </Text>
-                  </View>
-
-                  <View
-                    style={{
-                      marginTop: 15,
-                    }}
-                  >
-                    <Text style={{ fontSize: 15, fontWeight: '600' }}>Description</Text>
-                    <View style={{ paddingTop: 5 }}>
-                      <Text
-                        numberOfLines={2}
-                        style={{
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                        }}
-                      >
-                        {EncryptedData(inputDescription)}
-                      </Text>
-                    </View>
-                  </View>
-                </View>
-              </LinearGradient>
-            )}
           </View>
 
           {routeData?.screenId === 0 && (

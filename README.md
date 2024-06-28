@@ -1,5 +1,4 @@
-# PRIOTASK
-
+# ProEngine
 
 ## Getting Started
 
@@ -30,15 +29,17 @@ yarn install
 ```
 npx expo start
 ```
+
 OR
+
 ```
 npm run start
 ```
 
 This will build the package, and start metro server. Once the server is up, start your emulator (if on android), and press "a" OR to start your simulator (if on IOS), press "i" on the keyboard while focusing on the terminal. This will build the app into the emulator and you can proceed.
 
-To run in real devices, you need to download Expo Go apps from [here]([./apps/mobile/superapp/README.md](https://expo.dev/go)). 
+To run in real devices, you need to download Expo Go apps from [here](<[./apps/mobile/superapp/README.md](https://expo.dev/go)>).
 
 Once the apps ready, you might need to scan the QR code in terminal with Expo Go (Android) or the Camera app (iOS).
 
-Thank you. Enjoy with PRIOTASK.
+Thank you. Enjoy with ProEngine.

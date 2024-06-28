@@ -1,20 +1,31 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, SafeAreaView, ScrollView, TouchableOpacity } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  SafeAreaView,
+  ScrollView,
+  TouchableOpacity,
+  Image,
+  Platform,
+  Dimensions,
+} from 'react-native';
 import { useState } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { ProgressBar, AnimatedFAB } from 'react-native-paper';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
-
+import { Entypo } from '@expo/vector-icons';
 import moment from 'moment';
 import { arraysEqual } from '../utils.js';
 
-export default function Dashboard() {
+const SCREEN_WIDTH = Dimensions.get('window').width;
+
+export default function Home() {
   const navigation = useNavigation();
 
-  const [listTask, setListTask] = useState([]);
+  const [listProject, setListProject] = useState([]);
   const [isExtended, setIsExtended] = useState(true);
 
   const onScroll = ({ nativeEvent }) => {
@@ -25,59 +36,62 @@ export default function Dashboard() {
   const handlePressAddEdit = (item) => () => {
     const payload = {
       ...item,
-      screenName: item ? 'View Task' : 'Create Task',
+      screenName: item ? 'View Project' : 'Create Project',
       screenId: item ? 1 : 0,
     };
-    navigation.navigate('AddEditTask', payload);
+    navigation.navigate('AddEditProject', payload);
   };
 
   useFocusEffect(() => {
     const storeData = async () => {
       try {
-        const getValue = await AsyncStorage.getItem('@list_task');
+        const getValue = await AsyncStorage.getItem('@list_project');
         const result = JSON.parse(getValue) || [];
-        if (!arraysEqual(listTask, result)) {
-          setListTask(result);
+        if (!arraysEqual(listProject, result)) {
+          setListProject(result);
         }
       } catch (e) {
         console.error(e);
       }
     };
     storeData();
+    // AsyncStorage.clear();
   });
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="auto" />
       <ScrollView onScroll={onScroll}>
-        <View
-          style={{
-            marginTop: 20,
-            paddingHorizontal: 30,
-            flexDirection: 'row',
-          }}
-        >
-          <View style={{ flex: 1 }}>
-            <Text style={{ fontSize: 25, fontWeight: '800', color: '#3f9ae0' }}>ProEngine</Text>
-          </View>
-        </View>
-
-        <View
-          style={{
-            marginTop: 10,
-            flexDirection: 'row',
-            paddingHorizontal: 30,
-            paddingVertical: 10,
-          }}
-        >
-          <LinearGradient
-            colors={['#4cc0ee', '#1365c7']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={{ flex: 1, borderRadius: 10, paddingHorizontal: 20, paddingVertical: 25 }}
+        <View style={{ marginTop: Platform.OS === 'ios' ? 0 : 30 }}>
+          <View
+            style={{
+              flex: 1,
+              paddingHorizontal: 30,
+              paddingVertical: 25,
+              overflow: 'hidden',
+            }}
           >
+            <View style={{ flexDirection: 'row' }}>
+              <View
+                style={{
+                  position: 'absolute',
+                  top: -15,
+                  left: Platform.OS === 'ios' ? SCREEN_WIDTH / 9.8 : SCREEN_WIDTH / 10.8,
+                }}
+              >
+                <Entypo name="paper-plane" size={74} color="#c6edf8" />
+              </View>
+              <Text style={{ fontSize: 35, fontWeight: '800', color: '#184387' }}>ProEngine</Text>
+            </View>
+
+            <Image
+              style={{ position: 'absolute', top: -35, left: -130, zIndex: -1, opacity: 0.6 }}
+              width={10}
+              source={require('../../assets/engine.jpeg')}
+            />
             <View
               style={{
+                marginTop: 30,
                 display: 'flex',
                 flexDirection: 'row',
                 textAlign: 'flex-start',
@@ -85,45 +99,70 @@ export default function Dashboard() {
               }}
             >
               <View>
-                <Text style={{ color: '#ffffff', fontWeight: '900', fontSize: 20 }}>
+                <Text
+                  style={{
+                    color: '#11408d',
+                    fontWeight: '900',
+                    marginTop: 10,
+                    fontSize: 15,
+                    backgroundColor: '#cecece',
+                    paddingHorizontal: 5,
+                    paddingVertical: 3,
+                  }}
+                >
                   {moment().format('DD MMM YYYY')}
                 </Text>
-                <Text style={{ color: '#ffffff', fontWeight: '800', marginTop: 15 }}>
+                <Text
+                  style={{
+                    color: '#11408d',
+                    fontWeight: '800',
+                    marginTop: 10,
+                    backgroundColor: '#cecece',
+                    paddingHorizontal: 5,
+                    paddingVertical: 3,
+                  }}
+                >
                   Today's Summary
                 </Text>
-                <Text style={{ color: '#ffffff', fontWeight: '600', marginTop: 5 }}>
-                  {listTask?.filter((a) => moment.unix(a.dateTask).isSame(moment(), 'days'))
+                <Text
+                  style={{
+                    color: '#11408d',
+                    fontWeight: '700',
+                    backgroundColor: '#cecece',
+                    paddingHorizontal: 5,
+                    paddingVertical: 3,
+                  }}
+                >
+                  {listProject?.filter((a) => moment.unix(a.dateProject).isSame(moment(), 'days'))
                     ?.length > 0 &&
-                    listTask?.filter(
-                      (a) => a.isDone && moment.unix(a.dateTask).isSame(moment(), 'days')
+                    listProject?.filter(
+                      (a) => a.isDone && moment.unix(a.dateProject).isSame(moment(), 'days')
                     )?.length}
-                  {listTask?.filter((a) => moment.unix(a.dateTask).isSame(moment(), 'days'))
+                  {listProject?.filter((a) => moment.unix(a.dateProject).isSame(moment(), 'days'))
                     ?.length > 0 && ' of '}
                   {
-                    listTask?.filter((a) => moment.unix(a.dateTask).isSame(moment(), 'days'))
+                    listProject?.filter((a) => moment.unix(a.dateProject).isSame(moment(), 'days'))
                       ?.length
                   }
-                  {listTask?.filter((a) => moment.unix(a.dateTask).isSame(moment(), 'days'))
+                  {listProject?.filter((a) => moment.unix(a.dateProject).isSame(moment(), 'days'))
                     ?.length > 0
                     ? ' Completed'
-                    : ' Task'}
+                    : ' Project'}
                 </Text>
               </View>
-              <View style={{ position: 'absolute', right: 10, top: -10 }}>
-                <Ionicons name="logo-tableau" size={75} color="white" />
-              </View>
             </View>
-          </LinearGradient>
+          </View>
         </View>
 
         <View
           style={{
+            marginTop: 25,
             flexDirection: 'row',
             paddingHorizontal: 30,
             gap: 10,
           }}
         >
-          {listTask?.filter((a) => moment.unix(a.dateTask).isSame(moment(), 'days'))?.length >
+          {listProject?.filter((a) => moment.unix(a.dateProject).isSame(moment(), 'days'))?.length >
             0 && (
             <LinearGradient
               colors={['#4cc0ee', '#1365c7']}
@@ -144,41 +183,44 @@ export default function Dashboard() {
                 <Text style={{ color: '#fff', fontWeight: '700' }}>Progress</Text>
                 <Text style={{ color: '#fff', fontWeight: '700' }}>
                   {parseInt(
-                    (listTask?.filter((a) => moment.unix(a.dateTask).isSame(moment(), 'days'))
+                    (listProject?.filter((a) => moment.unix(a.dateProject).isSame(moment(), 'days'))
                       ?.length <
-                    listTask?.filter(
-                      (a) => a.isDone && moment.unix(a.dateTask).isSame(moment(), 'days')
+                    listProject?.filter(
+                      (a) => a.isDone && moment.unix(a.dateProject).isSame(moment(), 'days')
                     )?.length
                       ? 0
-                      : listTask?.filter(
-                          (a) => a.isDone && moment.unix(a.dateTask).isSame(moment(), 'days')
+                      : listProject?.filter(
+                          (a) => a.isDone && moment.unix(a.dateProject).isSame(moment(), 'days')
                         )?.length /
-                        listTask?.filter((a) => moment.unix(a.dateTask).isSame(moment(), 'days'))
-                          ?.length) * 100
+                        listProject?.filter((a) =>
+                          moment.unix(a.dateProject).isSame(moment(), 'days')
+                        )?.length) * 100
                   )}
                   %
                 </Text>
               </View>
               <ProgressBar
                 progress={
-                  listTask?.filter((a) => moment.unix(a.dateTask).isSame(moment(), 'days'))
+                  listProject?.filter((a) => moment.unix(a.dateProject).isSame(moment(), 'days'))
                     ?.length <=
-                  listTask?.filter(
-                    (a) => a.isDone && moment.unix(a.dateTask).isSame(moment(), 'days')
+                  listProject?.filter(
+                    (a) => a.isDone && moment.unix(a.dateProject).isSame(moment(), 'days')
                   )?.length
                     ? 0
-                    : listTask?.filter(
-                        (a) => a.isDone && moment.unix(a.dateTask).isSame(moment(), 'days')
+                    : listProject?.filter(
+                        (a) => a.isDone && moment.unix(a.dateProject).isSame(moment(), 'days')
                       )?.length /
-                      listTask?.filter((a) => moment.unix(a.dateTask).isSame(moment(), 'days'))
-                        ?.length
+                      listProject?.filter((a) =>
+                        moment.unix(a.dateProject).isSame(moment(), 'days')
+                      )?.length
                 }
                 color="lightgreen"
               />
             </LinearGradient>
           )}
-          {listTask?.filter((a) => !a.isDone && moment.unix(a.dateTask).isBefore(moment(), 'days'))
-            ?.length > 0 && (
+          {listProject?.filter(
+            (a) => !a.isDone && moment.unix(a.dateProject).isBefore(moment(), 'days')
+          )?.length > 0 && (
             <LinearGradient
               colors={['#f36b66', '#f53730']}
               start={{ x: 0, y: 0 }}
@@ -188,7 +230,7 @@ export default function Dashboard() {
                 borderRadius: 10,
                 paddingHorizontal: 20,
                 paddingVertical: 10,
-                gap: 2,
+                gap: 4,
               }}
             >
               <Text
@@ -196,25 +238,30 @@ export default function Dashboard() {
               >
                 Overdue
               </Text>
-              <Text style={{ color: '#ffffff', textAlign: 'center' }}>
+              <Text style={{ color: '#ffffff', textAlign: 'center', fontWeight: '700' }}>
                 {
-                  listTask?.filter(
-                    (a) => !a.isDone && moment.unix(a.dateTask).isBefore(moment(), 'days')
+                  listProject?.filter(
+                    (a) => !a.isDone && moment.unix(a.dateProject).isBefore(moment(), 'days')
                   )?.length
-                }{' '}
-                Task(s)
+                }
               </Text>
             </LinearGradient>
           )}
         </View>
 
-        {listTask?.filter((a) => moment.unix(a.dateTask).isSame(moment(), 'days'))?.length > 0 && (
+        <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'center' }}>
+          <View
+            style={{ marginTop: 20, borderWidth: 2, width: 100, borderColor: 'lightgrey' }}
+          ></View>
+        </View>
+
+        {listProject?.filter((a) => moment.unix(a.dateProject).isSame(moment(), 'days'))?.length >
+          0 && (
           <View
             style={{
               flexDirection: 'row',
               paddingHorizontal: 30,
               marginTop: 35,
-              marginBottom: 10,
             }}
           >
             <View
@@ -225,20 +272,23 @@ export default function Dashboard() {
                 alignItems: 'flex-end',
               }}
             >
-              <Text style={{ fontSize: 18, fontWeight: '700' }}>Today's Task(s)</Text>
+              <Text style={{ fontSize: 18, fontWeight: '700' }}>Today's Project(s)</Text>
             </View>
           </View>
         )}
 
-        {listTask?.length > 0 &&
-        listTask.filter((a) => !a.isDone && moment.unix(a.dateTask).isSameOrAfter(moment(), 'days'))
-          ?.length > 0
-          ? listTask
-              .filter((a) => !a.isDone && moment.unix(a.dateTask).isSameOrAfter(moment(), 'days'))
+        {listProject?.length > 0 &&
+        listProject.filter(
+          (a) => !a.isDone && moment.unix(a.dateProject).isSameOrAfter(moment(), 'days')
+        )?.length > 0
+          ? listProject
+              .filter(
+                (a) => !a.isDone && moment.unix(a.dateProject).isSameOrAfter(moment(), 'days')
+              )
               ?.map((a, i) => {
                 return (
                   !a.isDone &&
-                  moment.unix(a.dateTask).isSameOrAfter(moment(), 'days') &&
+                  moment.unix(a.dateProject).isSameOrAfter(moment(), 'days') &&
                   i < 3 && (
                     <TouchableOpacity onPress={handlePressAddEdit(a)} key={i}>
                       <View
@@ -281,7 +331,7 @@ export default function Dashboard() {
                                 fontSize: 16,
                               }}
                             >
-                              {a.taskName}
+                              {a.projectName}
                             </Text>
                           </View>
                           <Text
@@ -292,7 +342,7 @@ export default function Dashboard() {
                               whiteSpace: 'nowrap',
                             }}
                           >
-                            {a.description}
+                            {a.serialNo}
                           </Text>
                         </LinearGradient>
                       </View>
@@ -300,22 +350,22 @@ export default function Dashboard() {
                   )
                 );
               })
-          : listTask?.filter((a) => moment.unix(a.dateTask).isSame(moment(), 'days'))?.length >
-              0 && (
+          : listProject?.filter((a) => moment.unix(a.dateProject).isSame(moment(), 'days'))
+              ?.length > 0 && (
               <View style={{ paddingHorizontal: 30, marginTop: 10 }}>
-                <Text>No pending task. Have a great day!</Text>
+                <Text>No pending project. Have a great day!</Text>
               </View>
             )}
 
-        {listTask?.length > 0 &&
-          listTask?.filter((a) => !a.isDone && moment.unix(a.dateTask).isBefore(moment(), 'days'))
-            ?.length > 0 && (
+        {listProject?.length > 0 &&
+          listProject?.filter(
+            (a) => !a.isDone && moment.unix(a.dateProject).isBefore(moment(), 'days')
+          )?.length > 0 && (
             <View
               style={{
                 flexDirection: 'row',
                 paddingHorizontal: 30,
                 marginTop: 35,
-                marginBottom: 10,
               }}
             >
               <View
@@ -327,15 +377,15 @@ export default function Dashboard() {
                 }}
               >
                 <Text style={{ fontSize: 18, fontWeight: '700', color: '#f36b66' }}>
-                  Overdue Task(s)
+                  Overdue Project(s)
                 </Text>
               </View>
             </View>
           )}
 
-        {listTask?.length > 0 &&
-          listTask
-            ?.filter((a) => !a.isDone && moment.unix(a.dateTask).isBefore(moment(), 'days'))
+        {listProject?.length > 0 &&
+          listProject
+            ?.filter((a) => !a.isDone && moment.unix(a.dateProject).isBefore(moment(), 'days'))
             ?.map((a, i) => {
               return (
                 i < 3 && (
@@ -380,10 +430,10 @@ export default function Dashboard() {
                               fontSize: 16,
                             }}
                           >
-                            {a.taskName}
+                            {a.projectName}
                           </Text>
                         </View>
-                        <Text>{moment.unix(a.dateTask).format('DD MMM YYYY')}</Text>
+                        <Text>{moment.unix(a.dateProject).format('DD MMM YYYY')}</Text>
                         <Text
                           numberOfLines={2}
                           style={{
@@ -392,7 +442,7 @@ export default function Dashboard() {
                             whiteSpace: 'nowrap',
                           }}
                         >
-                          {a.description}
+                          {a.serialNo}
                         </Text>
                       </LinearGradient>
                     </View>
@@ -404,7 +454,7 @@ export default function Dashboard() {
 
       <AnimatedFAB
         icon={'plus'}
-        label={'Add New Task'}
+        label={'Add New Project'}
         extended={isExtended}
         onPress={handlePressAddEdit()}
         visible={true}
