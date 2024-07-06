@@ -111,7 +111,14 @@ export default function AddEditProject({ route }) {
     } catch (e) {
       console.error(e);
     } finally {
-      navigation.navigate('ListBlock', { projectId: listProject?.length - 1 });
+      const index = listProject
+        .map((a, i) =>
+          a.projectName == routeData.projectName && a.dateProject == routeData.dateProject
+            ? i + 1
+            : null
+        )
+        .filter((a) => a)?.[0];
+      navigation.navigate('ListBlock', { projectId: index - 1 });
     }
   };
 
