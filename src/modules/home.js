@@ -36,7 +36,7 @@ export default function Home() {
   const handlePressAddEdit = (item) => () => {
     const payload = {
       ...item,
-      screenName: item ? 'View Project' : 'Create Project',
+      screenName: item ? 'View Engine' : 'Create Engine',
       screenId: item ? 1 : 0,
     };
     navigation.navigate('AddEditProject', payload);
@@ -454,7 +454,7 @@ export default function Home() {
 
       <AnimatedFAB
         icon={'plus'}
-        label={'Add New Project'}
+        label={'Add New Engine'}
         extended={isExtended}
         onPress={handlePressAddEdit()}
         visible={true}

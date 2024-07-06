@@ -40,7 +40,7 @@ export default function ListTaskBlock({ route }) {
     );
     setListTask(arr);
 
-    const final = listProject?.map((a, i) => {
+    const result = listProject?.map((a, i) => {
       if (i === routeData?.projectId) {
         const temp = a.listBlock.map((b) => {
           if (b.blockId == routeData?.listId) {
@@ -54,6 +54,20 @@ export default function ListTaskBlock({ route }) {
         });
 
         return { ...a, listBlock: [...temp] };
+      }
+
+      return a;
+    });
+
+    const final = listProject?.map((a, i) => {
+      if (i === routeData?.projectId) {
+        return {
+          ...a,
+          isDone:
+            result?.[routeData?.projectId]?.listBlock?.filter(
+              (a) => a.listTask?.filter((b) => !b?.isSuccess)?.length
+            )?.length == 0,
+        };
       }
 
       return a;
