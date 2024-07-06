@@ -2,10 +2,10 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as React from 'react';
 import Dashboard from './src/modules/dashboard';
-import AddEditTask from './src/modules/addEditTask';
 import Home from './src/modules/home';
 import AddEditProject from './src/modules/addEditProject';
-import ListBlock from './src/modules/ListBlock';
+import AddEditTask from './src/modules/addEditTask';
+import ListBlock from './src/modules/listBlock';
 import ListTaskBlock from './src/modules/listTaskBlock';
 
 const Stack = createNativeStackNavigator();
