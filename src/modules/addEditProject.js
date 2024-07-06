@@ -105,6 +105,7 @@ export default function AddEditProject({ route }) {
       if (routeData?.screenId === 0) {
         listProject.push(payload);
         if (inputProjectName) {
+          setListProject(listProject);
           await AsyncStorage.setItem('@list_project', JSON.stringify(listProject));
         }
       }
@@ -118,7 +119,9 @@ export default function AddEditProject({ route }) {
             : null
         )
         .filter((a) => a)?.[0];
-      navigation.navigate('ListBlock', { projectId: index - 1 });
+      navigation.navigate('ListBlock', {
+        projectId: index > 0 ? index - 1 : listProject?.length - 1,
+      });
     }
   };
 
