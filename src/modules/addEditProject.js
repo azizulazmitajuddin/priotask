@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   Platform,
 } from 'react-native';
+import * as Clipboard from 'expo-clipboard';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { DecryptedData, EncryptedData } from '../utils.js/index.js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -204,21 +205,27 @@ export default function AddEditProject({ route }) {
               )}
             </View>
             {isEnabled && (
-              <LinearGradient
-                colors={['#dcdcdc', '#fff', '#dcdcdc']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={{
-                  padding: 10,
+              <TouchableOpacity
+                onPress={async () => {
+                  await Clipboard.setStringAsync(EncryptedData(inputSerialNo));
                 }}
               >
-                <Text
-                  numberOfLines={1}
-                  style={{ overflow: 'hidden', textOverflow: 'ellipsis', color: '#000' }}
+                <LinearGradient
+                  colors={['#dcdcdc', '#fff', '#dcdcdc']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={{
+                    padding: 10,
+                  }}
                 >
-                  Encrypted : {EncryptedData(inputSerialNo)}
-                </Text>
-              </LinearGradient>
+                  <Text
+                    numberOfLines={1}
+                    style={{ overflow: 'hidden', textOverflow: 'ellipsis', color: '#000' }}
+                  >
+                    Encrypted : {EncryptedData(inputSerialNo)}
+                  </Text>
+                </LinearGradient>
+              </TouchableOpacity>
             )}
 
             <Text style={{ fontSize: 15, fontWeight: '600', paddingTop: 30 }}>
